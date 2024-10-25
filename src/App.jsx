@@ -128,16 +128,44 @@ function App() {
   const [distances, setDistances] = useState([]);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const userPosition = [pos.coords.latitude, pos.coords.longitude];
-      setPosition(userPosition);
+    // Function to request location
+    const requestLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const userPosition = [pos.coords.latitude, pos.coords.longitude];
+          setPosition(userPosition);
 
-      const calculatedDistances = arryMall.map((mall) => {
-        const dist = L.latLng(userPosition).distanceTo(L.latLng(mall.position));
-        return dist;
+          // Calculate distances to each mall
+          const calculatedDistances = arryMall.map((mall) => {
+            const dist = L.latLng(userPosition).distanceTo(L.latLng(mall.position));
+            return dist;
+          });
+          setDistances(calculatedDistances);
+        },
+        (error) => {
+          console.error("Geolocation error:", error.message);
+          alert("Unable to get your location. Please enable location permissions.");
+        }
+      );
+    };
+
+    // Check geolocation permission status
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then((permissionStatus) => {
+        if (permissionStatus.state === "granted") {
+          requestLocation();
+        } else if (permissionStatus.state === "prompt") {
+          
+          requestLocation();
+        } else {
+          alert("Location access denied. Please enable it in your browser settings.");
+        }
+      })
+      .catch((error) => {
+        console.error("Permission API error:", error);
+        alert("Unable to access location permissions.");
       });
-      setDistances(calculatedDistances);
-    });
   }, []);
 
   if (!position) {
