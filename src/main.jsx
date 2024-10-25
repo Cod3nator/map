@@ -11,10 +11,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />
   },
-  {
-    path: "/map",
-    element: <Leaflet/>
-  }
+ 
 ])
 
 

@@ -1,178 +1,170 @@
 import React, { useState, useEffect } from "react";
-
 import {
   MapContainer,
   TileLayer,
   Marker,
-  useMap,
   CircleMarker,
   Tooltip,
+  Popup,
+  useMapEvents,
+  useMap,
 } from "react-leaflet";
-import L, { Icon, marker } from "leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import cup from "./assets/tea-cup.png";
-// UserLocationMarker component to render the mall locations with tooltips
+import person from "./assets/person.png";
 
-
-
-function UserLocationMarker({ malls, distances }) {
+function UserLocationMarker({ malls }) {
+  const [selectedStall, setSelectedStall] = useState(null);
+const map =useMap();
   const customIcon = new L.Icon({
     iconUrl: cup,
     iconSize: [50, 50]
-  
-  })
+  });
+
+  function openToast(mall) {
+    setSelectedStall(mall);
+    map.flyTo(mall.position, map.getZoom("15"))
+  }
   return (
     <>
       {malls.map((mall, index) => (
         <Marker
           key={index}
-          position={mall}
-          pathOptions={{ color: "red" }}
-          radius={10}
+          position={mall.position}
           icon={customIcon}
+          eventHandlers={{
+            click: () => openToast(mall),
+          }}
         >
-          <Tooltip>
-            {distances[index]
-              ? `Distance: ${(Math.round(distances[index]) / 1000).toFixed(3)} Km`
-              : "Calculating..."}
-            <br />
-            {distances[index]
-              ? `Time required to reach here: ${((Math.round(distances[index]) / 1000) / 5).toFixed(3)} hrs`
-              : "Calculating..."}
-          </Tooltip>
         </Marker>
       ))}
+
+      {selectedStall && (
+        <div className="absolute toast bottom-0 left-0 bg-gray-100 text-white p-4 rounded-md shadow-lg" style={{ zIndex: "9999", width: "100%" }}>
+          <h3 className="font-bold text-lg text-slate-800 pb-4">{selectedStall.name}</h3>
+          <a href={selectedStall.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">
+         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+         Get Directions
+         </button>
+          </a>
+          <button
+            onClick={() => setSelectedStall(null)}
+            className="ml-4 text-white bg-red-500 py-2 px-4 rounded"
+          >
+            Close
+          </button>
+        </div>
+      )}
     </>
   );
 }
 
-// Main App component
 function App() {
   const arryMall = [
-    [19.981605305895977, 73.83384419162938],
-    [19.964754300365655, 73.76200561803981],
-    [20.029609234445015, 73.75573144063314],
-    [19.96138448328795, 73.76290192909791],
-    [19.982444658586747, 73.83102156951318],
-    [19.971832168493393, 73.76609786422505],
-    [19.96343528644327, 73.74890761178776],
-    [19.96241716157973, 73.75367374025898],
-    [19.966353874629117, 73.75367374025898],
-    [19.966014506684772, 73.77035518990829],
-    [19.9657430118035, 73.76291714093045],
-    [19.978434897606824, 73.77035518990829],
-  ];
+    {
+      "position": [19.981605305895977, 73.83384419162938],
+      "name": "Tea Stall 1",
+      "link": "https://www.google.com/maps?q=19.981605305895977,73.83384419162938"
+    },
+    {
+      "position": [19.964754300365655, 73.76200561803981],
+      "name": "Tea Stall 2",
+      "link": "https://www.google.com/maps?q=19.964754300365655,73.76200561803981"
+    },
+    {
+      "position": [20.029609234445015, 73.75573144063314],
+      "name": "Tea Stall 3",
+      "link": "https://www.google.com/maps?q=20.029609234445015,73.75573144063314"
+    },
+    {
+      "position": [19.96138448328795, 73.76290192909791],
+      "name": "Tea Stall 4",
+      "link": "https://www.google.com/maps?q=19.96138448328795,73.76290192909791"
+    },
+    {
+      "position": [19.982444658586747, 73.83102156951318],
+      "name": "Tea Stall 5",
+      "link": "https://www.google.com/maps?q=19.982444658586747,73.83102156951318"
+    },
+    {
+      "position": [19.971832168493393, 73.76609786422505],
+      "name": "Tea Stall 6",
+      "link": "https://www.google.com/maps?q=19.971832168493393,73.76609786422505"
+    },
+    {
+      "position": [19.96343528644327, 73.74890761178776],
+      "name": "Tea Stall 7",
+      "link": "https://www.google.com/maps?q=19.96343528644327,73.74890761178776"
+    },
+    {
+      "position": [19.96241716157973, 73.75367374025898],
+      "name": "Tea Stall 8",
+      "link": "https://www.google.com/maps?q=19.96241716157973,73.75367374025898"
+    },
+    {
+      "position": [19.966353874629117, 73.75367374025898],
+      "name": "Tea Stall 9",
+      "link": "https://www.google.com/maps?q=19.966353874629117,73.75367374025898"
+    },
+    {
+      "position": [19.966014506684772, 73.77035518990829],
+      "name": "Tea Stall 10",
+      "link": "https://www.google.com/maps?q=19.966014506684772,73.77035518990829"
+    },
+    {
+      "position": [19.9657430118035, 73.76291714093045],
+      "name": "Tea Stall 11",
+      "link": "https://www.google.com/maps?q=19.9657430118035,73.76291714093045"
+    },
+    {
+      "position": [19.978434897606824, 73.77035518990829],
+      "name": "Tea Stall 12",
+      "link": "https://www.google.com/maps?q=19.978434897606824,73.77035518990829"
+    }
+  ]
 
   const [position, setPosition] = useState(null);
   const [distances, setDistances] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // State to toggle sidebar
 
   useEffect(() => {
-   
-    navigator.geolocation.getCurrentPosition((position) => {
-      const userLocation = [19.981602305595977, 73.83281419162938];
-      setPosition(userLocation);
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const userPosition = [pos.coords.latitude, pos.coords.longitude];
+      setPosition(userPosition);
 
-      // Calculate distances to each mall
       const calculatedDistances = arryMall.map((mall) => {
-        const dist = L.latLng(userLocation).distanceTo(mall);
+        const dist = L.latLng(userPosition).distanceTo(L.latLng(mall.position));
         return dist;
       });
       setDistances(calculatedDistances);
     });
   }, []);
-    
-  // const map = useMap();
-  
-  const gotoPosition = (mall) => {
-    console.log(mall);
-    // map.flyTo(mall, 15); 
-  };
+
+  if (!position) {
+    return <div>Loading your location...</div>;
+  }
+  const personIcon = new L.Icon({
+    iconUrl: person,
+    iconSize: [50, 50]
+  });
 
   return (
     <>
-      <div
-        className="container mx-auto flex justify-center items-center overflow-hidden"
-        style={{ width: "100vw", height: "100vh", objectPosition: "center" }}
-      >
-        <MapContainer
-          center={[19.981602305595977, 73.83281419162938]}
-          zoom={13}
-          style={{ height: "100vh", width: "100%" }}
-        >
-          <CircleMarker
-            center={[19.981602305595977, 73.83281419162938]}
-            radius={200}
-            pathOptions={{ color: "#7CB9E8" }}
-          >
-            <Marker position={[19.981602305595977, 73.83281419162938]}></Marker>
-            <Tooltip permanent>"Here you are"</Tooltip>
-          </CircleMarker>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <UserLocationMarker malls={arryMall} distances={distances} />
-        </MapContainer>
-        <div className="absolute right-0">
-      {/* Toggle Button */}
-      <button
-        className="absolute top-4 right-4 z-50 bg-white p-2 rounded-full shadow-md bg-slate-100"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        style={{ zIndex: 1005 }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-panel-left-open"
-        >
-          <rect width="18" height="18" x="3" y="3" rx="2" />
-          <path d="M9 3v18" />
-          <path d="m14 9 3 3-3 3" />
-        </svg>
-      </button>
-
-      {/* Sidebar */}
-      <div
-        className={`sidebar h-screen relative  bg-slate-900 p-4 transition-transform duration-300 ${
-          isSidebarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-        style={{ width: "420px", zIndex: 1000 }}
-      >
-          <h1 className="text-white text-4xl font-bold" style={{ zIndex: 100 }}>
-            Stalls
-          </h1>
-          <ul className="text-white mt-4">
-            {arryMall.map((mall, index) => (
-              <li
-                key={index}
-                className="mb-4"
-                style={{ cursor: "pointer", listStyleType: "none" }}
-                onClick={() => gotoPosition(mall)} 
-              >
-                <strong>Stall {index + 1}:</strong>
-                <br />
-                <br />
-                {distances[index]
-                  ? `Distance: ${(Math.round(distances[index]) / 1000).toFixed(3)} Km`
-                  : "Calculating..."}
-                <br />
-                {distances[index]
-                  ? `Time: ${(((Math.round(distances[index]) / 1000) / 5).toFixed(3))} hrs`
-                  : "Calculating..."}
-              </li>
-            ))}
-          </ul>
-        </div>
-        </div>
-      </div>
+      <h1 className="text-3xl font-bold text-center">Find Tea Stall Near You</h1>
+      <MapContainer center={[19.963873912499395, 73.76624711906366]} zoom={13} >
+        <CircleMarker center={position} radius={200} pathOptions={{ color: "#7CB9E8" }}>
+         <Marker position={position} icon={personIcon}>
+         <Tooltip >"Here you are"</Tooltip>
+         </Marker>
+        
+        </CircleMarker>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <UserLocationMarker malls={arryMall} distances={distances} />
+      </MapContainer>
+    
     </>
   );
 }
